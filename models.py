@@ -9,7 +9,7 @@ db = SQLAlchemy()
 
 # User Model
 class User(db.Model):
-    id = db.Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True)
     email = db.Column(db.String(120), unique=True)
     password = db.Column(db.String(60), nullable=False)
@@ -20,7 +20,7 @@ class User(db.Model):
 
 # Category Model
 class Category(db.Model):
-    id = db.Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
     expenses = db.relationship('Expense', backref='category', lazy=True)
 
@@ -29,7 +29,7 @@ class Category(db.Model):
 
 # Expense Model
 class Expense(db.Model):
-    id = db.Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
