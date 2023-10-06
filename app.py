@@ -22,7 +22,7 @@ jwt = JWTManager(app)
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_TRACK_ECHO = True
 
-CORS(app)
+CORS(app, supports_credentials=True)
 bcrypt = Bcrypt(app)
 db.init_app(app)
 
@@ -44,10 +44,10 @@ def create_token():
     user = User.query.filter_by(email=email).first()
 
     if user is None:
-        return jsonify({"error": "Wrong email or passowrd"})
+        return jsonify({"error": "Wrong email or passowrd"}), 401
    
     if not bcrypt.check_password_hash(user.password, password):
-        return jsonify({"error": "Unauthorized access"})
+        return jsonify({"error": "Unauthorized access"}), 401
     
     access_token = create_access_token(identity=email)
     
@@ -58,6 +58,7 @@ def create_token():
     
 @app.route("/signup", methods=["POST"])
 def signup():
+    username = request.json.get("username")
     email = request.json.get("email")
     password = request.json.get("password")
 
@@ -67,7 +68,7 @@ def signup():
         return jsonify({"error": "Email already exists"}), 409
 
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')    
-    new_user = User(username="musk", email=email, password=hashed_password)
+    new_user = User(username=username, email=email, password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
 
