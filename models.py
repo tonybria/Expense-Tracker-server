@@ -10,9 +10,9 @@ def get_uuid():
 # User Model
 class User(db.Model):
     id = db.Column(db.String(11), primary_key=True, default=get_uuid)
-    username = db.Column(db.String(50), unique=True)
-    email = db.Column(db.String(50), unique=True)
-    password = db.Column(db.Text, nullable=False)
+    username = db.Column(db.String(100), unique=True)
+    email = db.Column(db.String(120), unique=True)
+    password = db.Column(db.String(60), nullable=False)
     expenses = db.relationship('Expense', backref='user', lazy=True)
 
     def __repr__(self):
