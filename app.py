@@ -120,24 +120,24 @@ def my_profile(getemail):
 
 
 
-@app.route("/<string:username>/expenses", methods=["GET", "POST"])
-def expenses(username):
+@app.route("/<string:username>/expenses", methods=["GET","POST"])
+def get_expenses(username):
     if request.method == "GET":
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(username=username).first()  # Fixed filter_by
         if not user:
             response = make_response(
                 jsonify({'message': 'User not found'}), 404
             )
             return response
         else:
-            expenses = Expense.query.filter_by(user_id=user.id).all()
+            expenses = Expense.query.filter_by(user_id=user.id).all()  # Fixed filter_by
             expense_list = []
             for expense in expenses:
                 expense_dict = {
                     "id": expense.id,
                     "name": expense.name,
                     "amount": expense.amount,
-                    "date": expense.date.isoformat(),
+                    "date": expense.date.isoformat(),  # Added () to isoformat
                     "category": expense.category.name
                 }
                 expense_list.append(expense_dict)
@@ -145,44 +145,41 @@ def expenses(username):
                 jsonify(expense_list), 200
             )
             return response
-# Route for creating a new expense
-@app.route("/<string:username>/expenses", methods=["POST"])
-def create_expense(username):
-    data = request.json
+    elif request.method == "POST":
+        data = request.json
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            response = make_response(
+                jsonify({'message': 'User not found'}), 404
+            )
+            return response
+        else:
+            category_name = data.get('category')
+            category = Category.query.filter_by(name=category_name).first()
+            if not category:
+                # Create a new category if it doesn't exist
+                category = Category(name=category_name)
+                db.session.add(category)
+                db.session.commit()
+            
+            date_str = data['date']
+            expense_date = date.fromisoformat(date_str)
+            new_expense = Expense(
+                name=data['name'],
+                amount=data['amount'],
+                date=expense_date,
+                user_id=user.id,
+                category_id=category.id
+            )
+            
+            db.session.add(new_expense)
+            db.session.commit()
 
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        response = make_response(
-            jsonify({'message': 'User not found'}), 404
-        )
-        return response
+            response = make_response(
+                jsonify({'message': 'Expense added successfully'}), 201
+            )
+            return response
 
-    name = data.get('name')
-    amount = data.get('amount')
-    date_str = data.get('date')
-    category_name = data.get('category')
-
-    category = Category.query.filter_by(name=category_name).first()
-    if not category:
-        category = Category(name=category_name)
-        db.session.add(category)
-
-    expense_date = date.fromisoformat(date_str)
-
-    new_expense = Expense(
-        name=name,
-        amount=amount,
-        date=expense_date,
-        user_id=user.id,
-        category_id=category.id
-    )
-
-    db.session.add(new_expense)
-    db.session.commit()
-
-    response = make_response(
-        jsonify({'message': 'Expense added successfully'}), 201
-    )
     return response
 
 if __name__ == '__main__':
