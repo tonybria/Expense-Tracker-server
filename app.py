@@ -11,11 +11,11 @@ from datetime import date
 
 app = Flask(__name__)
 
-# Configure your database connection
+
 app.config['SECRET_KEY'] = 'ricktheruler-nyc'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.json.compact = False  # Use app.json_encoder.compact
+app.json.compact = False  
 
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 jwt = JWTManager(app)
