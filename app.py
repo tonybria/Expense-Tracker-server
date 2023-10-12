@@ -35,7 +35,8 @@ migrate = Migrate(app, db)
 
 @app.route("/")
 def hello_world():
-    return "<p>Hello Mars!</p>"
+
+    return "<p>Hello Mars!!</p>"
 
 @app.route("/login", methods=["POST"])
 def create_token():
